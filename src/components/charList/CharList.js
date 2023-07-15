@@ -5,13 +5,11 @@ import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 
 class CharList extends Component {
-  constructor(props) {
-    super(props);
-  }
   state = {
     charList: [],
     loading: true,
     error: false,
+    newItemLoading: false,
   };
   marvelService = new MarvelService();
 
@@ -20,13 +18,21 @@ class CharList extends Component {
   }
 
   updateList = () => {
-    this.marvelService
-      .getAllCharacters()
-      .then(this.onLoading)
-      .catch(this.onError);
+    this.onRequest();
   };
 
-  onLoading = (charList) => {
+  onRequest = (offset) => {
+    this.onCharListLoading();
+    this.marvelService
+      .getAllCharacters(offset)
+      .then(this.onCharListLoaded)
+      .catch(this.onError);
+  };
+  onCharListLoading = () => {
+    this.setState({ newItemLoading: true });
+  };
+
+  onCharListLoaded = (charList) => {
     this.setState({ charList, loading: false });
   };
   onError = () => {
