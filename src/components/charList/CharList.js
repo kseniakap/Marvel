@@ -1,4 +1,6 @@
 import { Component } from "react";
+import PropTypes from "prop-types";
+
 import "./charList.scss";
 import MarvelService from "../../services/MarvelService";
 import Spinner from "../spinner/Spinner";
@@ -10,13 +12,14 @@ class CharList extends Component {
     loading: true,
     error: false,
     newItemLoading: false,
+    offset: 230,
+    charEnded: false,
   };
   marvelService = new MarvelService();
 
   componentDidMount() {
     this.updateList();
   }
-
   updateList = () => {
     this.onRequest();
   };
@@ -28,13 +31,27 @@ class CharList extends Component {
       .then(this.onCharListLoaded)
       .catch(this.onError);
   };
+
   onCharListLoading = () => {
     this.setState({ newItemLoading: true });
   };
 
-  onCharListLoaded = (charList) => {
-    this.setState({ charList, loading: false });
+  onCharListLoaded = (newcharList) => {
+    let ended = false;
+    if (newcharList.length < 9) {
+      ended = true;
+    }
+    //проверка на то, что персонажи закончились
+
+    this.setState(({ offset, charList }) => ({
+      charList: [...charList, ...newcharList],
+      loading: false,
+      newItemLoading: false,
+      offset: offset + 9,
+      charEnded: ended,
+    }));
   };
+
   onError = () => {
     this.setState({ loading: false, error: true });
   };
@@ -63,7 +80,8 @@ class CharList extends Component {
   };
 
   render() {
-    const { charList, loading, error } = this.state;
+    const { charList, loading, error, newItemLoading, offset, charEnded } =
+      this.state;
 
     const items = this.renderItems(charList);
 
@@ -75,12 +93,21 @@ class CharList extends Component {
         {errorMessage}
         {spinner}
         {content}
-        <button className="button button__main button__long">
+        <button
+          disabled={newItemLoading}
+          onClick={() => this.onRequest(offset)}
+          style={{ display: charEnded ? "none" : "block" }}
+          className="button button__main button__long"
+        >
           <div className="inner">load more</div>
         </button>
       </div>
     );
   }
 }
+
+CharList.propTypes = {
+  onCharSelected: PropTypes.func.isRequired,
+};
 
 export default CharList;
