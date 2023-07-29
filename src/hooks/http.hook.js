@@ -22,8 +22,10 @@ export const useHttp = () => {
         }
 
         const data = await response.json();
+
         setLoading(false);
         return data;
+
       } catch (e) {
         setLoading(false);
         setError(e.message);
