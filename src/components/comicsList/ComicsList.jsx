@@ -1,9 +1,10 @@
 import React, {useState, useEffect}from 'react';
+import { Link } from 'react-router-dom';
+
 import useMarvelService from "../../services/MarvelService";
 
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Spinner from "../spinner/Spinner";
-
 
 import "../../style/button.scss"
 import "./comicsList.scss"
@@ -42,12 +43,12 @@ const ComicsList = () => {
     const items = arr.map((item, i)=>{
       return (
         <li key={i} className="comics__card">
-          <a href="#">
+          <Link to={`/comics/${item.id}`}>
             <img src={item.thumbnail} alt={item.title} className="comics__img" />
             <div className="comics__title">{item.title}</div>
             <div className="comics__price">{item.price}</div>
 
-          </a>
+          </Link>
         </li>
       )
     })
